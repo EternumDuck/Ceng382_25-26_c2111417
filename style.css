@@ -488,3 +488,12 @@ main {
     transform: translateX(50%) rotate(135deg);
     z-index: 3;
   }
+
+.clock-area {
+    color: var(--eva-orange);
+    font-size: 2rem;
+}
+
+.hidden {
+    display: none;
+}
