@@ -1,0 +1,89 @@
+:root {
+  --eva-orange: #ff8200;
+  --eva-background: #0d0d0d;
+  --eva-highlight: #ff3d00;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--eva-background);
+  color: var(--eva-orange);
+  font-family: "Courier New", monospace;
+  padding: 2rem;
+  min-height: 100vh;
+}
+
+form {
+  margin-bottom: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+input,
+button {
+  padding: 0.5rem;
+  background-color: var(--eva-background);
+  border: 1px solid var(--eva-orange);
+  color: var(--eva-orange);
+  font-family: "Courier New", monospace;
+}
+
+button {
+  background-color: var(--eva-orange);
+  color: var(--eva-background);
+  border: none;
+  padding: 0.7rem;
+  text-transform: uppercase;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: var(--eva-highlight);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  border: 1px solid var(--eva-orange);
+}
+
+th,
+td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--eva-orange);
+}
+
+th {
+  background-color: rgba(255, 130, 0, 0.2);
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+tr:hover {
+  background-color: rgba(255, 130, 0, 0.1);
+}
+
+tr:nth-child(even) {
+  background-color: rgba(255, 130, 0, 0.05);
+}
+
+.delete-btn {
+  cursor: pointer;
+  color: var(--eva-highlight);
+  font-weight: bold;
+  text-align: center;
+}
+
+.delete-btn:hover {
+  color: var(--eva-orange);
+}
