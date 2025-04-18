@@ -5,81 +5,154 @@
 }
 
 <div class="container">
-    <div class="row">
-        <div class="col-md-6">
-            <form method="post" class="form-group" asp-page-handler="Add">
-                <input type="hidden" asp-for="EditingId" />
-                <div class="mb-3">
-                    <label for="Class_Name" class="form-label">Class Name</label>
-                    <input type="text" id="Class_Name" asp-for="ClassInformationModel.ClassName" class="form-control" />
-                    <span asp-validation-for="ClassInformationModel.ClassName" class="text-danger"></span>
+    <!-- Filter Form -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" name="searchTerm" value="@Model.TableModel.SearchTerm" 
+                                placeholder="Search by class name or description...">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="number" class="form-control" name="minStudents" value="@Model.TableModel.MinStudents" 
+                                placeholder="Min students">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="number" class="form-control" name="maxStudents" value="@Model.TableModel.MaxStudents" 
+                                placeholder="Max students">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">Filter</button>
+                        </div>
+                    </form>
                 </div>
-                <div class="mb-3">
-                    <label for="Student_Count" class="form-label">Student Count</label>
-                    <input type="number" id="Student_Count" asp-for="ClassInformationModel.StudentCount" class="form-control" />
-                    <span asp-validation-for="ClassInformationModel.StudentCount" class="text-danger"></span>
-                </div>
-                <div class="mb-3">
-                    <label for="Description" class="form-label">Description</label>
-                    <textarea id="Description" asp-for="ClassInformationModel.Description" class="form-control"></textarea>
-                    <span asp-validation-for="ClassInformationModel.Description" class="text-danger"></span>
-                </div>
-                <button type="submit" class="btn btn-primary">@(Model.EditingId.HasValue ? "Update" : "Submit")</button>
-                @if (Model.EditingId.HasValue)
-                {
-                    <a asp-page="Index" class="btn btn-secondary">Cancel</a>
-                }
-            </form>
+            </div>
         </div>
-        <div class="col-md-6">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Id</th>
-                        <th>Class Name</th>
-                        <th>Student Count</th>
-                        <th>Description</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (Model.Classes.Any())
+    </div>
+
+    <div class="row">
+        <!-- Add/Edit Form -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">@(Model.EditingId.HasValue ? "Edit Class" : "Add New Class")</h5>
+                    <form method="post" asp-page-handler="Add">
+                        <input type="hidden" asp-for="EditingId" />
+                        <div class="mb-3">
+                            <label asp-for="ClassInformationModel.ClassName" class="form-label">Class Name</label>
+                            <input asp-for="ClassInformationModel.ClassName" class="form-control" />
+                            <span asp-validation-for="ClassInformationModel.ClassName" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="ClassInformationModel.StudentCount" class="form-label">Student Count</label>
+                            <input asp-for="ClassInformationModel.StudentCount" class="form-control" />
+                            <span asp-validation-for="ClassInformationModel.StudentCount" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="ClassInformationModel.Description" class="form-label">Description</label>
+                            <textarea asp-for="ClassInformationModel.Description" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="ClassInformationModel.Description" class="text-danger"></span>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">@(Model.EditingId.HasValue ? "Update" : "Add")</button>
+                            @if (Model.EditingId.HasValue)
+                            {
+                                <a asp-page="Index" class="btn btn-secondary">Cancel</a>
+                            }
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Class Table -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Class Information</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Class Name</th>
+                                    <th>Student Count</th>
+                                    <th>Description</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.TableModel.Items)
+                                {
+                                    <tr>
+                                        <td>@item.ClassName</td>
+                                        <td>@item.StudentCount</td>
+                                        <td>@item.Description</td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a asp-page-handler="Edit" asp-route-id="@item.Id" 
+                                                   class="btn btn-warning btn-sm">Edit</a>
+                                                <a asp-page-handler="Delete" 
+                                                   asp-route-id="@item.Id"
+                                                   asp-route-pageNumber="@Model.TableModel.CurrentPage"
+                                                   asp-route-searchTerm="@Model.TableModel.SearchTerm"
+                                                   asp-route-minStudents="@Model.TableModel.MinStudents"
+                                                   asp-route-maxStudents="@Model.TableModel.MaxStudents"
+                                                   class="btn btn-danger btn-sm" 
+                                                   onclick="return confirm('Are you sure you want to delete this class?')">
+                                                    Delete
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    @if (Model.TableModel.TotalPages > 1)
                     {
-                        @foreach (var item in Model.Classes)
-                        {
-                            <tr>
-                                <td>@item.Id</td>
-                                <td>@item.ClassName</td>
-                                <td>@item.StudentCount</td>
-                                <td>@item.Description</td>
-                                <td>
-                                    <a asp-page="Index" asp-page-handler="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
-                                            <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325"/>
-                                        </svg>
-                                    </a>
-                                    <a asp-page="Index" asp-page-handler="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-                                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
-                                            <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
-                                        </svg>
-                                    </a>
-                                </td>
-                            </tr>
-                        }
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-center">
+                                @if (Model.TableModel.CurrentPage > 1)
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" href="?pageNumber=@(Model.TableModel.CurrentPage - 1)&searchTerm=@Model.TableModel.SearchTerm&minStudents=@Model.TableModel.MinStudents&maxStudents=@Model.TableModel.MaxStudents">Previous</a>
+                                    </li>
+                                }
+
+                                @for (int i = 1; i <= Model.TableModel.TotalPages; i++)
+                                {
+                                    <li class="page-item @(i == Model.TableModel.CurrentPage ? "active" : "")">
+                                        <a class="page-link" href="?pageNumber=@i&searchTerm=@Model.TableModel.SearchTerm&minStudents=@Model.TableModel.MinStudents&maxStudents=@Model.TableModel.MaxStudents">@i</a>
+                                    </li>
+                                }
+
+                                @if (Model.TableModel.CurrentPage < Model.TableModel.TotalPages)
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" href="?pageNumber=@(Model.TableModel.CurrentPage + 1)&searchTerm=@Model.TableModel.SearchTerm&minStudents=@Model.TableModel.MinStudents&maxStudents=@Model.TableModel.MaxStudents">Next</a>
+                                    </li>
+                                }
+                            </ul>
+                        </nav>
                     }
-                    else
-                    {
-                        <tr>
-                            <td colspan="5" class="text-center">No classes available</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 @section Scripts {
+    <script>
+        // Auto-submit filter form when any filter value changes
+        document.querySelectorAll('form[method="get"] input').forEach(input => {
+            input.addEventListener('change', () => {
+                input.form.submit();
+            });
+        });
+    </script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

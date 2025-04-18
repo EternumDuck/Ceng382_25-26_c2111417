@@ -7,6 +7,7 @@ namespace LabProject.Pages;
 public class IndexModel : PageModel
 {
     private readonly ILogger<IndexModel> _logger;
+    private const int PageSize = 10;
 
     [BindProperty]
     public ClassInformationModel ClassInformationModel { get; set; } = new ClassInformationModel();
@@ -14,25 +15,87 @@ public class IndexModel : PageModel
     [BindProperty]
     public int? EditingId { get; set; }
 
-    public List<ClassInformationModel> Classes { get; set; } = new List<ClassInformationModel>();
+    public ClassInformationTable TableModel { get; set; } = new();
+    private static List<ClassInformationModel> _allClasses = GenerateSampleData();
 
-    private static List<ClassInformationModel> _allClasses = new List<ClassInformationModel>();
+
+    public List<ClassInformationModel> Classes { get; set; } = new List<ClassInformationModel>();
 
     public IndexModel(ILogger<IndexModel> logger)
     {
         _logger = logger;
     }
-
-    public void OnGet()
+    private static List<ClassInformationModel> GenerateSampleData()
     {
-        Classes = _allClasses;
+        var sampleData = new List<ClassInformationModel>();
+        var random = new Random(42); // Fixed seed for consistent data
+
+        for (int i = 1; i <= 100; i++)
+        {
+            var model = new ClassInformationModel
+            {
+                Id = i,
+                ClassName = $"Class {(char)('A' + (i % 26))} - {i}",
+                StudentCount = random.Next(1, 101),
+                Description = $"Sample description for class {i}"
+            };
+            sampleData.Add(model);
+        }
+        return sampleData;
+    }
+    
+    // Filtering and pagination logic
+    public void OnGet(int? pageNumber, string? searchTerm, int? minStudents, int? maxStudents)
+    {
+        // Apply filters
+        var query = _allClasses.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            query = query.Where(c => c.ClassName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                || c.Description.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
+        }
+
+        if (minStudents.HasValue)
+        {
+            query = query.Where(c => c.StudentCount >= minStudents.Value);
+        }
+
+        if (maxStudents.HasValue)
+        {
+            query = query.Where(c => c.StudentCount <= maxStudents.Value);
+        }
+
+        // Calculate pagination
+        var totalItems = query.Count();
+        var currentPage = pageNumber ?? 1;
+        var totalPages = (int)Math.Ceiling(totalItems / (double)PageSize);
+
+        // Apply pagination
+        var items = query
+            .Skip((currentPage - 1) * PageSize)
+            .Take(PageSize)
+            .ToList();
+
+        // Update table model
+        TableModel = new ClassInformationTable
+        {
+            Items = items,
+            CurrentPage = currentPage,
+            TotalPages = totalPages,
+            PageSize = PageSize,
+            SearchTerm = searchTerm,
+            MinStudents = minStudents,
+            MaxStudents = maxStudents
+        };
     }
 
     public IActionResult OnPostAdd()
     {
         if (!ModelState.IsValid)
         {
-            Classes = _allClasses;
+            // Reload the table model for the current page
+            OnGet(null, null, null, null);
             return Page();
         }
 
@@ -53,16 +116,12 @@ public class IndexModel : PageModel
         }
 
         _allClasses.Add(ClassInformationModel);
-        Classes = _allClasses;
-
-        // Reset form
-        ClassInformationModel = new ClassInformationModel();
-        EditingId = null;
-
-        return Page();
+        
+        // Reset form and redirect to first page
+        return RedirectToPage("/Index");
     }
 
-    public IActionResult OnGetDelete(int id)
+    public IActionResult OnGetDelete(int id, int? pageNumber, string? searchTerm, int? minStudents, int? maxStudents)
     {
         var classToRemove = _allClasses.Find(c => c.Id == id);
         if (classToRemove != null)
@@ -70,8 +129,8 @@ public class IndexModel : PageModel
             _allClasses.Remove(classToRemove);
         }
 
-        Classes = _allClasses;
-        return Page();
+        // Redirect back to the same page with all query parameters
+        return RedirectToPage("/Index", new { pageNumber, searchTerm, minStudents, maxStudents });
     }
 
     public IActionResult OnGetEdit(int id)

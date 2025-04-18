@@ -20,3 +20,44 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+/* Filtering and Pagination Styles */
+.card {
+  margin-bottom: 1.5rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.card-body {
+  padding: 1.25rem;
+}
+
+.pagination {
+  margin-top: 1.5rem;
+  margin-bottom: 0;
+}
+
+.pagination .page-link {
+  color: #0d6efd;
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+  color: #fff;
+}
+
+.pagination .page-link:hover {
+  background-color: #e9ecef;
+  border-color: #dee2e6;
+  color: #0a58ca;
+}
+
+.table-responsive {
+  margin-bottom: 1rem;
+}
+
+.btn-group {
+  gap: 0.25rem;
+}
