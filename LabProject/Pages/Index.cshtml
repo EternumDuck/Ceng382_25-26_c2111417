@@ -32,6 +32,41 @@
         </div>
     </div>
 
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5>Export Options</h5>
+        </div>
+        <div class="card-body">
+            <form method="post" class="mb-3">
+                <input type="hidden" name="searchTerm" value="@Model.TableModel.SearchTerm" />
+                <input type="hidden" name="minStudents" value="@Model.TableModel.MinStudents" />
+                <input type="hidden" name="maxStudents" value="@Model.TableModel.MaxStudents" />
+                <div class="mb-3">
+                    <label class="form-label">Select Columns to Export:</label>
+                    <div class="row">
+                        @foreach (var column in Model.AvailableColumns)
+                        {
+                            <div class="col-auto">
+                                <div class="form-check">
+                                    <input class="form-check-input column-checkbox" type="checkbox" name="SelectedColumns" value="@column" id="@column">
+                                    <label class="form-check-label" for="@column">@column</label>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button type="submit" asp-page-handler="ExportJson" class="btn btn-primary" title="Export all records">
+                        Export All to JSON
+                    </button>
+                    <button type="submit" asp-page-handler="ExportJson" asp-route-exportFiltered="true" class="btn btn-secondary" title="Export only filtered records">
+                        Export Filtered to JSON
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="row">
         <!-- Add/Edit Form -->
         <div class="col-md-4">
@@ -151,6 +186,20 @@
         document.querySelectorAll('form[method="get"] input').forEach(input => {
             input.addEventListener('change', () => {
                 input.form.submit();
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkboxes = document.querySelectorAll('.column-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const label = this.parentElement.querySelector('label');
+                    if (this.checked) {
+                        label.classList.add('text-primary', 'fw-bold');
+                    } else {
+                        label.classList.remove('text-primary', 'fw-bold');
+                    }
+                });
             });
         });
     </script>

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using LabProject.Utilities;
 using System.Collections.Generic;
 
 namespace LabProject.Pages;
@@ -15,11 +16,15 @@ public class IndexModel : PageModel
     [BindProperty]
     public int? EditingId { get; set; }
 
+    [BindProperty]
+    public string[]? SelectedColumns { get; set; }
+
     public ClassInformationTable TableModel { get; set; } = new();
     private static List<ClassInformationModel> _allClasses = GenerateSampleData();
 
-
     public List<ClassInformationModel> Classes { get; set; } = new List<ClassInformationModel>();
+    
+    public string[] AvailableColumns => new[] { "Id", "ClassName", "StudentCount", "Description" };
 
     public IndexModel(ILogger<IndexModel> logger)
     {
@@ -150,5 +155,39 @@ public class IndexModel : PageModel
 
         Classes = _allClasses;
         return Page();
+    }
+
+    public IActionResult OnPostExportJson(bool exportFiltered = false, string? searchTerm = null, int? minStudents = null, int? maxStudents = null)
+    {
+        var dataToExport = _allClasses;
+        
+        if (exportFiltered)
+        {
+            var query = _allClasses.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                query = query.Where(c => c.ClassName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                    || c.Description.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (minStudents.HasValue)
+            {
+                query = query.Where(c => c.StudentCount >= minStudents.Value);
+            }
+
+            if (maxStudents.HasValue)
+            {
+                query = query.Where(c => c.StudentCount <= maxStudents.Value);
+            }
+
+            dataToExport = query.ToList();
+        }
+
+        var jsonData = JsonExportUtil.Instance.ExportToJson(dataToExport, SelectedColumns);
+        var fileName = exportFiltered ? "filtered_classes.json" : "all_classes.json";
+        byte[] bytes = System.Text.Encoding.UTF8.GetBytes(jsonData);
+        
+        return File(bytes, "application/json", fileName);
     }
 }
