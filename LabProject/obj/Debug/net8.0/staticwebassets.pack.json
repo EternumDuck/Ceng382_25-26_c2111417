@@ -9,6 +9,10 @@
       "PackagePath": "staticwebassets/css/site.css"
     },
     {
+      "Id": "/Users/omar/Documents/GitHub/Ceng382_25-26_c2111417/LabProject/wwwroot/data/users.json",
+      "PackagePath": "staticwebassets/data/users.json"
+    },
+    {
       "Id": "/Users/omar/Documents/GitHub/Ceng382_25-26_c2111417/LabProject/wwwroot/favicon.ico",
       "PackagePath": "staticwebassets/favicon.ico"
     },

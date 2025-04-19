@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "/UUmkz6oUdQXliSmpqQY8hxQfM/GTGV9NdiLRRHHMVU=",
+  "Hash": "tXG8C55GQXADiADhxiSF7F5fPI/ZRN2zBYX3c3W1LbI=",
   "Source": "LabProject",
   "BasePath": "_content/LabProject",
   "Mode": "Default",
@@ -72,6 +72,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/css/site.css"
+    },
+    {
+      "Identity": "/Users/omar/Documents/GitHub/Ceng382_25-26_c2111417/LabProject/wwwroot/data/users.json",
+      "SourceId": "LabProject",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/omar/Documents/GitHub/Ceng382_25-26_c2111417/LabProject/wwwroot/",
+      "BasePath": "_content/LabProject",
+      "RelativePath": "data/users.json",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/data/users.json"
     },
     {
       "Identity": "/Users/omar/Documents/GitHub/Ceng382_25-26_c2111417/LabProject/wwwroot/favicon.ico",

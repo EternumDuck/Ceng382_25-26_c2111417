@@ -30,6 +30,27 @@ public class IndexModel : PageModel
     {
         _logger = logger;
     }
+
+    private bool ValidateAuthentication()
+    {
+        var sessionUsername = HttpContext.Session.GetString("username");
+        var sessionToken = HttpContext.Session.GetString("token");
+        var sessionId = HttpContext.Session.GetString("session_id");
+
+        if (string.IsNullOrEmpty(sessionUsername) || string.IsNullOrEmpty(sessionToken) || string.IsNullOrEmpty(sessionId))
+        {
+            return false;
+        }
+
+        var cookieUsername = Request.Cookies["username"];
+        var cookieToken = Request.Cookies["token"];
+        var cookieSessionId = Request.Cookies["session_id"];
+
+        return sessionUsername == cookieUsername && 
+               sessionToken == cookieToken && 
+               sessionId == cookieSessionId;
+    }
+
     private static List<ClassInformationModel> GenerateSampleData()
     {
         var sampleData = new List<ClassInformationModel>();
@@ -50,9 +71,13 @@ public class IndexModel : PageModel
     }
     
     // Filtering and pagination logic
-    public void OnGet(int? pageNumber, string? searchTerm, int? minStudents, int? maxStudents)
+    public IActionResult OnGet(int? pageNumber, string? searchTerm, int? minStudents, int? maxStudents)
     {
-        // Apply filters
+        if (!ValidateAuthentication())
+        {
+            return RedirectToPage("/Login");
+        }
+
         var query = _allClasses.AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
@@ -93,6 +118,8 @@ public class IndexModel : PageModel
             MinStudents = minStudents,
             MaxStudents = maxStudents
         };
+
+        return Page();
     }
 
     public IActionResult OnPostAdd()
@@ -106,7 +133,6 @@ public class IndexModel : PageModel
 
         if (EditingId.HasValue)
         {
-            // Update existing class
             var existingClass = _allClasses.Find(c => c.Id == EditingId.Value);
             if (existingClass != null)
             {
@@ -116,7 +142,7 @@ public class IndexModel : PageModel
         }
         else
         {
-            // Only generate new ID for new classes
+            // Only generate new ID for new classes so the ID is unique
             ClassInformationModel.Id = ClassInformationModel.GenerateNewId();
         }
 
@@ -157,14 +183,12 @@ public class IndexModel : PageModel
         return Page();
     }
 
-    public IActionResult OnPostExportJson(bool exportFiltered = false, string? searchTerm = null, int? minStudents = null, int? maxStudents = null)
+    public IActionResult OnPostExportJson(bool exportFiltered = false, string? searchTerm = null, int? minStudents = null, int? maxStudents = null, int? pageNumber = null)
     {
-        var dataToExport = _allClasses;
+        var query = _allClasses.AsQueryable();
         
         if (exportFiltered)
         {
-            var query = _allClasses.AsQueryable();
-
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
                 query = query.Where(c => c.ClassName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
@@ -181,11 +205,16 @@ public class IndexModel : PageModel
                 query = query.Where(c => c.StudentCount <= maxStudents.Value);
             }
 
-            dataToExport = query.ToList();
+            // If we're exporting filtered data and have a page number, only export that page
+            if (pageNumber.HasValue)
+            {
+                query = query.Skip((pageNumber.Value - 1) * PageSize).Take(PageSize);
+            }
         }
 
+        var dataToExport = query.ToList();
         var jsonData = JsonExportUtil.Instance.ExportToJson(dataToExport, SelectedColumns);
-        var fileName = exportFiltered ? "filtered_classes.json" : "all_classes.json";
+        var fileName = exportFiltered ? (pageNumber.HasValue ? $"page_{pageNumber}_classes.json" : "filtered_classes.json") : "all_classes.json";
         byte[] bytes = System.Text.Encoding.UTF8.GetBytes(jsonData);
         
         return File(bytes, "application/json", fileName);
