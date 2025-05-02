@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/Users/omar/Documents/GitHub/Ceng382_25-26_c2111417/LabProject/LabProject.csproj": {}
+    "C:\\webdev\\Ceng382_25-26_c2111417\\LabProject\\LabProject.csproj": {}
   },
   "projects": {
-    "/Users/omar/Documents/GitHub/Ceng382_25-26_c2111417/LabProject/LabProject.csproj": {
+    "C:\\webdev\\Ceng382_25-26_c2111417\\LabProject\\LabProject.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/omar/Documents/GitHub/Ceng382_25-26_c2111417/LabProject/LabProject.csproj",
+        "projectUniqueName": "C:\\webdev\\Ceng382_25-26_c2111417\\LabProject\\LabProject.csproj",
         "projectName": "LabProject",
-        "projectPath": "/Users/omar/Documents/GitHub/Ceng382_25-26_c2111417/LabProject/LabProject.csproj",
-        "packagesPath": "/Users/omar/.nuget/packages/",
-        "outputPath": "/Users/omar/Documents/GitHub/Ceng382_25-26_c2111417/LabProject/obj/",
+        "projectPath": "C:\\webdev\\Ceng382_25-26_c2111417\\LabProject\\LabProject.csproj",
+        "packagesPath": "C:\\Users\\omerh\\.nuget\\packages\\",
+        "outputPath": "C:\\webdev\\Ceng382_25-26_c2111417\\LabProject\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/Users/omar/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\omerh\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -37,11 +37,24 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        }
+        },
+        "SdkAnalysisLevel": "9.0.200"
       },
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.EntityFrameworkCore.SqlServer": {
+              "target": "Package",
+              "version": "[9.0.4, )"
+            },
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[9.0.4, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
@@ -53,6 +66,24 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.15, 8.0.15]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.win-x64",
+              "version": "[8.0.15, 8.0.15]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.15, 8.0.15]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[8.0.15, 8.0.15]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -61,7 +92,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.407/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

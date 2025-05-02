@@ -1,4 +1,10 @@
+using LabProject.Data;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDbContext<SchoolDbContext>(options =>
+ options.UseSqlServer(builder.Configuration.GetConnectionString("SchoolDbConnection")));
 
 builder.Services.AddRazorPages();
 builder.Services.AddSession(options =>

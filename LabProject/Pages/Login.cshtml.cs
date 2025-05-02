@@ -1,48 +1,35 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Text.Json;
 using LabProject.Models;
+using LabProject.Data;
 
 namespace LabProject.Pages
 {
     public class LoginModel : PageModel
     {
-        private readonly IWebHostEnvironment _environment;
+        private readonly SchoolDbContext _context;
 
         [BindProperty]
-        public string Username { get; set; }
+        public string? Username { get; set; }
 
         [BindProperty]
-        public string Password { get; set; }
+        public string? Password { get; set; }
 
-        public string ErrorMessage { get; set; }
+        public string? ErrorMessage { get; set; }
 
-        public LoginModel(IWebHostEnvironment environment)
+        public LoginModel(SchoolDbContext context)
         {
-            _environment = environment;
+            _context = context;
         }
 
         public void OnGet()
         {
-            // Clear errors
             ErrorMessage = null;
         }
 
         public IActionResult OnPostAsync()
         {
-            // Read users from JSON file
-            var usersFilePath = Path.Combine(_environment.WebRootPath, "data", "users.json");
-            if (!System.IO.File.Exists(usersFilePath))
-            {
-                ErrorMessage = "User database not found.";
-                return Page();
-            }
-
-            var jsonString = System.IO.File.ReadAllText(usersFilePath);
-            var users = JsonSerializer.Deserialize<List<User>>(jsonString);
-
-            // Validate user credentials user is active
-            var user = users?.FirstOrDefault(u => 
+            var user = _context.Users.FirstOrDefault(u => 
                 u.Username == Username && 
                 u.Password == Password && 
                 u.IsActive);
@@ -52,25 +39,18 @@ namespace LabProject.Pages
                 ErrorMessage = "Username or password is incorrect.";
                 return Page();
             }
-            // Genereate a session token not escure 
+
+            //session token 
             var token = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
-            //4 Store user information in session
+            var sessionId = Guid.NewGuid().ToString();
+            
             HttpContext.Session.SetString("username", user.Username);
             HttpContext.Session.SetString("token", token);
-            HttpContext.Session.SetString("session_id", HttpContext.Session.Id);
+            HttpContext.Session.SetString("session_id", sessionId);
 
-            // cookies
-            var cookieOptions = new CookieOptions
-            {
-                Expires = DateTime.UtcNow.AddMinutes(30),
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict
-            };
-
-            Response.Cookies.Append("username", user.Username, cookieOptions);
-            Response.Cookies.Append("token", token, cookieOptions);
-            Response.Cookies.Append("session_id", HttpContext.Session.Id, cookieOptions);
+            Response.Cookies.Append("username", user.Username);
+            Response.Cookies.Append("token", token);
+            Response.Cookies.Append("session_id", sessionId);
 
             return RedirectToPage("/Index");
         }
@@ -78,12 +58,11 @@ namespace LabProject.Pages
         public IActionResult OnPostLogout()
         {
             HttpContext.Session.Clear();
-
-            Response.Cookies.Delete("username");
-            Response.Cookies.Delete("token");
-            Response.Cookies.Delete("session_id");
-
-            return RedirectToPage("/Login");
+            foreach (var cookie in Request.Cookies.Keys)
+            {
+                Response.Cookies.Delete(cookie);
+            }
+            return RedirectToPage("/Index");
         }
     }
 }
